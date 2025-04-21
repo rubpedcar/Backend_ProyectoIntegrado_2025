@@ -1,7 +1,7 @@
 <?php
 
-require_once "utiles/funciones.php";
-require_once "utiles/variables.php";
+require_once "../utiles/funciones.php";
+require_once "../utiles/variables.php";
 
 $conexion = conectarPDO($host, $user, $password, $bbdd);
 
