@@ -121,6 +121,22 @@
 	}
 
 
+//Mostrar los datos de salida con las cabeceras recibidas
+function salidaDatos($data, $httpHeaders=array())
+{
+	if (is_array($httpHeaders) && count($httpHeaders)) 
+	{
+	  foreach ($httpHeaders as $httpHeader) 
+	  {
+	    header($httpHeader);
+	  }
+	}
+
+	print_r($data);
+	exit();
+}
+
+
 /**
  * FIN FUNCIONES TRABAJAR CON BBDD
  */
