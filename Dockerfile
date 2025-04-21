@@ -5,7 +5,7 @@ FROM php:8.2-cli
 WORKDIR /app
 
 # Copia todos los archivos del proyecto al contenedor
-COPY . .
+COPY ./api /app
 
 # Expón el puerto (Railway lo usará)
 EXPOSE 8080
