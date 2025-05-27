@@ -1,10 +1,9 @@
 <?php
-	// Definición de variables
 
-	$host = "tramway.proxy.rlwy.net";
-	$user = "root";
-	$password = "kyiiYamyvkYMGXmtBTujAlCNgrfPoZHt";
-	$bbdd = "railway";
+	$host = "192.168.1.135";
+	$user = "proyecto";
+	$password = "proyecto";
+	$bbdd = "rallydb";
 
 	$headerJSON = 'Content-Type: application/json';
     $codigosHTTP = [ 

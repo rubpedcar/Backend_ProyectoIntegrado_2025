@@ -24,7 +24,8 @@
     }
 
     /*
-    * Método que valida si el campo de texto está dentro de los límites indicado
+    * Método que valida si el campo está de texti está dentro de los límites indicado
+    * tiene una longitud mínima de tres caracteres
     * @param {string} $texto - Texto a validar
     * @param {int} $minimo - Longitud mínimo que puede tener
     * @param {int} $maximo - Longitud máxima que puede tener
@@ -99,7 +100,7 @@
     {
         try 
         {
-          $mysql = "mysql:host=$host;port=57942;dbname=$bbdd;charset=utf8";;
+          $mysql="mysql:host=$host;dbname=$bbdd;charset=utf8";
           $conexion = new PDO($mysql, $user, $password);
           // set the PDO error mode to exception
           $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -121,18 +122,17 @@
 	}
 
 
-//Mostrar los datos de salida con las cabeceras recibidas
-function salidaDatos($data, $httpHeaders=array())
+  function salidaDatos($data, $httpHeaders=array())
 {
 	if (is_array($httpHeaders) && count($httpHeaders)) 
 	{
-	  foreach ($httpHeaders as $httpHeader) 
-	  {
-	    header($httpHeader);
-	  }
+	foreach ($httpHeaders as $httpHeader) 
+	{
+	header($httpHeader);
+	}
 	}
 
-	print_r($data);
+	print $data;
 	exit();
 }
 
