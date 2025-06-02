@@ -13,16 +13,16 @@
 
         if(isset($_GET["id"]))
         {
-            $consulta = "SELECT nombre FROM usuarios WHERE id = :id";
+            $consulta = "SELECT * FROM usuarios WHERE id = :id";
 
             $resultado = $conexion -> prepare($consulta);
             $resultado -> bindParam(":id", $_GET["id"]);
 
             $resultado -> execute();
 
-            $nombre = $resultado -> fetch(PDO::FETCH_ASSOC);
+            $usuario = $resultado -> fetch(PDO::FETCH_ASSOC);
 
-            echo json_encode($nombre);
+            echo json_encode($usuario);
         }
         else
         {
@@ -84,5 +84,11 @@
             echo json_encode(["mensaje" => "Error: Ya existe un usuario con ese email", "error" => true]);
             //echo $codigosHTTP["404"];
         }
+    }
+
+
+    if($_SERVER["REQUEST_METHOD"] == "PUT")
+    {
+        $datos = json_decode(file_get_contents("php://input"), true);
     }
 ?>
