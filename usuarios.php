@@ -93,39 +93,45 @@
 
         $conexion = conectarPDO($host, $user, $password, $bbdd);
 
-        $consulta = "SELECT * FROM usuarios WHERE nombre = :nombre";
+        $consulta = "SELECT * FROM usuarios WHERE email = :email";
 
         $resultado = $conexion -> prepare($consulta);
 
-        $resultado -> bindParam(":nombre", $datos["nombre"]);
+        $resultado -> bindParam(":email", $datos["email"]);
 
         $resultado -> execute();
 
-        if($resultado -> rowCount() == 0)
+        $usuario = $resultado -> fetch(PDO::FETCH_ASSOC);
+
+        if($resultado -> rowCount() == 0 || $usuario["id"] == $datos["id"])
         {
-            $consulta = "SELECT * FROM usuarios WHERE nombre = :email";
+            $consulta = "UPDATE usuarios SET nombre = :nombre, email = :email WHERE id = :id";
 
             $resultado = $conexion -> prepare($consulta);
 
+            $resultado -> bindParam(":id", $datos["id"]);
+            $resultado -> bindParam(":nombre", $datos["nombre"]);
             $resultado -> bindParam(":email", $datos["email"]);
 
-            $resultado -> execute();
+            try
+            {
+                $resultado -> execute();
 
-            if($resultado -> rowCount() == 0)
+                header($headerJSON);
+                echo json_encode(["mensaje" => "Usuario Actualizado.", "error" => false]);
+            }
+            catch(PDOException $e)
             {
                 header($headerJSON);
-                echo json_encode(["mensaje" => "Error: Ya existe un usuario con ese email", "error" => false]);
+                echo json_encode(["mensaje" => "Error: " . $e, "error" => true]);
             }
-            else
-            {
-                header($headerJSON);
-                echo json_encode(["mensaje" => "Error: Ya existe un usuario con ese email", "error" => true]);
-            }
+
+            
         }
         else
         {
             header($headerJSON);
-            echo json_encode(["mensaje" => "Error: Ya existe un usuario con ese nombre", "error" => true]);
+            echo json_encode(["mensaje" => "Error: Ya existe un usuario con ese email", "error" => true]);
         }
     }
 ?>
