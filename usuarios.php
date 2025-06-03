@@ -90,5 +90,42 @@
     if($_SERVER["REQUEST_METHOD"] == "PUT")
     {
         $datos = json_decode(file_get_contents("php://input"), true);
+
+        $conexion = conectarPDO($host, $user, $password, $bbdd);
+
+        $consulta = "SELECT * FROM usuarios WHERE nombre = :nombre";
+
+        $resultado = $conexion -> prepare($consulta);
+
+        $resultado -> bindParam(":nombre", $datos["nombre"]);
+
+        $resultado -> execute();
+
+        if($resultado -> rowCount() == 0)
+        {
+            $consulta = "SELECT * FROM usuarios WHERE nombre = :email";
+
+            $resultado = $conexion -> prepare($consulta);
+
+            $resultado -> bindParam(":email", $datos["email"]);
+
+            $resultado -> execute();
+
+            if($resultado -> rowCount() == 0)
+            {
+                header($headerJSON);
+                echo json_encode(["mensaje" => "Error: Ya existe un usuario con ese email", "error" => false]);
+            }
+            else
+            {
+                header($headerJSON);
+                echo json_encode(["mensaje" => "Error: Ya existe un usuario con ese email", "error" => true]);
+            }
+        }
+        else
+        {
+            header($headerJSON);
+            echo json_encode(["mensaje" => "Error: Ya existe un usuario con ese nombre", "error" => true]);
+        }
     }
 ?>
