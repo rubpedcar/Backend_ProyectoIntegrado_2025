@@ -12,7 +12,7 @@
 
         if(isset($_GET["id"]))
         {
-            $consulta = "SELECT * FROM publicaciones WHERE usuario_id = :usuario_id";
+            $consulta = "SELECT * FROM publicaciones WHERE usuario_id = :usuario_id ORDER BY estado_id";
 
             $resultado = $conexion -> prepare($consulta);
             $resultado -> bindParam(":usuario_id", $_GET["id"]);
@@ -54,6 +54,6 @@
 
     if($_SERVER["REQUEST_METHOD"] == "POST")
     {
-
+        
     }
 ?>
