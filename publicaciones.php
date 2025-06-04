@@ -54,6 +54,32 @@
 
     if($_SERVER["REQUEST_METHOD"] == "POST")
     {
+        $datos = json_decode(file_get_contents("php://input"), true);
+
+        $conexion = conectarPDO($host, $user, $password, $bbdd);
+
+        $consulta = "INSERT INTO publicaciones (usuario_id, categoria_id, nombre, descripcion, imagen, estado_id, created_at, updated_at) 
+                            VALUES(:usuario_id, :categoria_id, :nombre, :descripcion, :imagen, 2, NOW(), NOW())";
         
+        $resultado = $conexion -> prepare($consulta);
+
+        $resultado -> bindParam(":usuario_id", $datos["usuario_id"]);
+        $resultado -> bindParam(":categoria_id", $datos["categoria_id"]);
+        $resultado -> bindParam(":nombre", $datos["nombre"]);
+        $resultado -> bindParam(":descripcion", $datos["descripcion"]);
+        $resultado -> bindParam(":imagen", $datos["imagen"]);
+
+        try
+        {
+            $resultado -> execute();
+
+            header($headerJSON);
+            echo json_encode(["mensaje" => "Publicación Creada.", "error" => false]);
+        }
+        catch(PDOException $e)
+        {
+            header($headerJSON);
+            echo json_encode(["mensaje" => "Error: " . $e, "error" => true]);
+        }
     }
 ?>
