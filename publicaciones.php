@@ -6,38 +6,59 @@
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
     header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
+
+
     if($_SERVER["REQUEST_METHOD"] == "GET")
     {
         $conexion = conectarPDO($host, $user, $password, $bbdd);
 
         if(isset($_GET["id"]))
         {
-            $consulta = "SELECT * FROM publicaciones WHERE usuario_id = :usuario_id ORDER BY estado_id";
-
-            $resultado = $conexion -> prepare($consulta);
-            $resultado -> bindParam(":usuario_id", $_GET["id"]);
-
-            $resultado -> execute();
-            if($resultado -> rowCount() != 0)
+            // Si el id es del admin, mostrará todas las publicaciones existentes.
+            if($_GET["id"] == 1)
             {
+                $consulta = "SELECT * FROM publicaciones ORDER BY estado_id";
+
+                $resultado = resultadoConsulta($conexion, $consulta);
+
+                $publicaciones = [];
+
                 while($publicacion = $resultado -> fetch(PDO::FETCH_ASSOC))
                 {
                     $publicaciones[] = $publicacion;
                 }
-                
+
                 echo json_encode($publicaciones);
             }
             else
             {
-                $datos = [];
-                //$datos["error"] = true;;  
-                
-                echo json_encode($datos);
+                $consulta = "SELECT * FROM publicaciones WHERE usuario_id = :usuario_id ORDER BY estado_id";
+
+                $resultado = $conexion -> prepare($consulta);
+                $resultado -> bindParam(":usuario_id", $_GET["id"]);
+
+                $resultado -> execute();
+                if($resultado -> rowCount() != 0)
+                {
+                    while($publicacion = $resultado -> fetch(PDO::FETCH_ASSOC))
+                    {
+                        $publicaciones[] = $publicacion;
+                    }
+                    
+                    echo json_encode($publicaciones);
+                }
+                else
+                {
+                    $datos = [];
+                    //$datos["error"] = true;;  
+                    
+                    echo json_encode($datos);
+                }
             }
         }
         else
         {
-            $consulta = "SELECT * FROM publicaciones";
+            $consulta = "SELECT * FROM publicaciones WHERE estado_id = 1";
 
             $resultado = resultadoConsulta($conexion, $consulta);
 

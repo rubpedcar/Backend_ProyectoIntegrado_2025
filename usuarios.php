@@ -105,7 +105,7 @@
 
         if($resultado -> rowCount() == 0 || $usuario["id"] == $datos["id"])
         {
-            $consulta = "UPDATE usuarios SET nombre = :nombre, email = :email WHERE id = :id";
+            $consulta = "UPDATE usuarios SET nombre = :nombre, email = :email, updated_at = NOW() WHERE id = :id";
 
             $resultado = $conexion -> prepare($consulta);
 
