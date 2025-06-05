@@ -12,7 +12,7 @@
     {
         $conexion = conectarPDO($host, $user, $password, $bbdd);
 
-        if(isset($_GET["id"]))
+        if(isset($_GET["id"])) // Búsqueda por id del usuario.
         {
             // Si el id es del admin, mostrará todas las publicaciones existentes.
             if($_GET["id"] == 1)
@@ -55,6 +55,21 @@
                     echo json_encode($datos);
                 }
             }
+        }
+        else if(isset($_GET["idPublicacion"])) // Búsqueda por id de publicación.
+        {
+
+            $consulta = "SELECT * FROM publicaciones WHERE id = :id";
+
+            $resultado = $conexion -> prepare($consulta);
+
+            $resultado -> bindParam(":id", $_GET["idPublicacion"]);
+
+            $resultado -> execute();
+
+            $publicacion = $resultado -> fetch(PDO::FETCH_ASSOC);
+
+            echo json_encode($publicacion);
         }
         else
         {
