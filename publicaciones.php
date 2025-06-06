@@ -146,5 +146,27 @@
 
 
 
-    
+    if($_SERVER["REQUEST_METHOD"] == "DELETE")
+    {
+        $datos = json_decode(file_get_contents("php://input"), true);
+
+        $conexion = conectarPDO($host, $user, $password, $bbdd);
+        
+        $consulta = "DELETE FROM publicaciones WHERE id = :id";
+        $resultado = $conexion -> prepare($consulta);
+        $resultado -> bindParam(":id", $datos["idPublicacion"]);
+
+        try
+        {
+            $resultado -> execute();
+
+            header($headerJSON);
+            echo json_encode(["mensaje" => "Publicación Eliminada.", "error" => false]);
+        }
+        catch(PDOException $e)
+        {
+            header($headerJSON);
+            echo json_encode(["mensaje" => "Error: " . $e, "error" => true]);
+        }
+    }
 ?>
