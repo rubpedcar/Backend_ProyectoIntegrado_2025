@@ -90,32 +90,55 @@
 
     if($_SERVER["REQUEST_METHOD"] == "POST")
     {
-        $datos = json_decode(file_get_contents("php://input"), true);
+        $datos = $_POST;
 
         $conexion = conectarPDO($host, $user, $password, $bbdd);
 
-        $consulta = "INSERT INTO publicaciones (usuario_id, categoria_id, nombre, descripcion, imagen, estado_id, created_at, updated_at) 
+
+
+        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+            $nombreOriginal = $_FILES['imagen']['name'];
+            $temporal = $_FILES['imagen']['tmp_name'];
+
+            $carpeta = "uploads/";
+            if (!is_dir($carpeta)) {
+                mkdir($carpeta, 0755, true);
+            }
+
+            $nuevoNombre = uniqid() . "_" . basename($nombreOriginal);
+            $ruta = $carpeta . $nuevoNombre;
+
+            if (move_uploaded_file($temporal, $ruta)) {
+                $consulta = "INSERT INTO publicaciones (usuario_id, categoria_id, nombre, descripcion, imagen, estado_id, created_at, updated_at) 
                             VALUES(:usuario_id, :categoria_id, :nombre, :descripcion, :imagen, 2, NOW(), NOW())";
         
-        $resultado = $conexion -> prepare($consulta);
+                $resultado = $conexion -> prepare($consulta);
 
-        $resultado -> bindParam(":usuario_id", $datos["usuario_id"]);
-        $resultado -> bindParam(":categoria_id", $datos["categoria_id"]);
-        $resultado -> bindParam(":nombre", $datos["nombre"]);
-        $resultado -> bindParam(":descripcion", $datos["descripcion"]);
-        $resultado -> bindParam(":imagen", $datos["imagen"]);
+                $resultado -> bindParam(":usuario_id", $datos["usuario_id"]);
+                $resultado -> bindParam(":categoria_id", $datos["categoria_id"]);
+                $resultado -> bindParam(":nombre", $datos["nombre"]);
+                $resultado -> bindParam(":descripcion", $datos["descripcion"]);
+                $resultado -> bindParam(":imagen", $ruta);
 
-        try
-        {
-            $resultado -> execute();
+                try
+                {
+                    $resultado -> execute();
 
-            header($headerJSON);
-            echo json_encode(["mensaje" => "Publicación Creada.", "error" => false]);
+                    header($headerJSON);
+                    echo json_encode(["mensaje" => "Publicación Creada.", "error" => false]);
+                }
+                catch(PDOException $e)
+                {
+                    header($headerJSON);
+                    echo json_encode(["mensaje" => "Error: " . $e, "error" => true]);
+                }
+            } 
+            else 
+            {
+                header($headerJSON);
+                echo json_encode(["mensaje" => "Error: Error al mover la imagen.", "error" => true]);
+            }
         }
-        catch(PDOException $e)
-        {
-            header($headerJSON);
-            echo json_encode(["mensaje" => "Error: " . $e, "error" => true]);
-        }
+   
     }
 ?>
