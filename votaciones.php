@@ -37,4 +37,49 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
         echo json_encode($votaciones);
     }
 }
+
+if($_SERVER["REQUEST_METHOD"] == "POST")
+{
+    $datos = json_decode(file_get_contents("php://input"), true);
+
+    $conexion = conectarPDO($host, $user, $password, $bbdd);
+
+    $consulta = "SELECT * FROM bases";
+    $resultado = resultadoConsulta($conexion, $consulta);
+    $bases  = $resultado -> fetch(PDO::FETCH_ASSOC);
+    $maxVotos = $bases["limite_votos"];
+
+    $consulta = "SELECT * FROM votaciones WHERE usuario_ip = :ip";
+    $resultado = $conexion -> prepare($consulta);
+    $resultado -> bindParam(":ip", $datos["usuario_ip"]);
+    $resultado -> execute();
+
+    if($resultado -> rowCount() < $maxVotos)
+    {
+        $consulta = "INSERT INTO votaciones (publicacion_id, usuario_ip) VALUES (:publicacion_id, :usuario_ip)";
+        $resultado = $conexion -> prepare($consulta);
+        $resultado -> bindParam(":publicacion_id", $datos["publicacion_id"]);
+        $resultado -> bindParam(":usuario_ip", $datos["usuario_ip"]);
+        
+
+        try
+        {
+            $resultado -> execute();
+
+            header($headerJSON);
+            echo json_encode(["error" => false, "mensaje" => "Voto registrado correctamente."]);
+        }
+        catch(PDOException $e)
+        {
+            header($headerJSON);
+            echo json_encode(["error" => true, "mensaje" => "Error al registrar el voto: " . $e->getMessage()]);
+        }
+        
+    }
+    else
+    {
+        header($headerJSON);
+        echo json_encode(["error" => true, "mensaje" => "Ya has alcanzado el límite de votos."]);
+    }
+}
 ?>
