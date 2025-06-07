@@ -151,6 +151,18 @@
         $datos = json_decode(file_get_contents("php://input"), true);
 
         $conexion = conectarPDO($host, $user, $password, $bbdd);
+
+
+        $consulta = "SELECT imagen FROM publicaciones WHERE id = :id";
+        $resultado = $conexion -> prepare($consulta);
+        $resultado -> bindParam(":id", $datos["idPublicacion"]);
+        $resultado -> execute();
+        $publicacion = $resultado -> fetch(PDO::FETCH_ASSOC);
+        
+        if ($publicacion && file_exists($publicacion['imagen'])) {
+            unlink($publicacion['imagen']); // Elimina la imagen del servidor
+        }
+
         
         $consulta = "DELETE FROM publicaciones WHERE id = :id";
         $resultado = $conexion -> prepare($consulta);
