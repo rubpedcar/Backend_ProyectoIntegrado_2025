@@ -14,13 +14,37 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
 
     $resultado = resultadoConsulta($conexion, $consulta);
 
-    $bases = [];
-
-    while($base = $resultado -> fetch(PDO::FETCH_ASSOC))
-    {
-        $bases[] = $base;
-    }
+    $bases = $resultado -> fetch(PDO::FETCH_ASSOC);
 
     echo json_encode($bases);
+}
+
+if($_SERVER["REQUEST_METHOD"] == "PUT")
+{
+    $conexion = conectarPDO($host, $user, $password, $bbdd);
+
+    $datos = json_decode(file_get_contents("php://input"), true);
+
+    $consulta = "UPDATE bases 
+    SET limite_fotos = :limite_fotos, limite_votos = :limite_votos, plazo_votaciones = :plazo_votaciones, plazo_publicaciones = :plazo_publicaciones";
+
+    $resultado = $conexion -> prepare($consulta);
+    $resultado -> bindParam(":limite_fotos", $datos["limite_fotos"]);
+    $resultado -> bindParam(":limite_votos", $datos["limite_votos"]);
+    $resultado -> bindParam(":plazo_votaciones", $datos["plazo_votaciones"]);
+    $resultado -> bindParam(":plazo_publicaciones", $datos["plazo_publicaciones"]);
+
+    try
+    {
+        $resultado -> execute();
+
+        header($headerJSON);
+        echo json_encode(["error" => false, "mensaje" => "Bases actualizadas correctamente."]);
+    }
+    catch(PDOException $e)
+    {
+        header($headerJSON);
+        echo json_encode(["error" => true, "mensaje" => "Error al actualizar las bases: " . $e->getMessage()]);
+    }
 }
 ?>
