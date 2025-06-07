@@ -1,9 +1,9 @@
 <?php
 
-	$host = "192.168.1.135";
-	$user = "proyecto";
-	$password = "proyecto";
-	$bbdd = "rallydb";
+	$host = "sql204.byethost13.com";
+	$user = "b13_39179921";
+	$password = "b13_39179921";
+	$bbdd = "b13_39179921_rallydb";
 
 	$headerJSON = 'Content-Type: application/json';
     $codigosHTTP = [ 
